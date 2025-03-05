@@ -1,9 +1,28 @@
 import concurrent.futures
- 
+import pygame
+import random
+
 def calcular_area(largo, ancho):
     """Calcula el área de una zona multiplicando largo por ancho."""
     return largo * ancho
- 
+
+def lerp(a, b, t):
+    """Interpolación lineal entre a y b."""
+    return a + (b - a) * t
+
+class Acro:
+    def __init__(self, x, y):
+        self.x = x
+        self.y = y
+        self.size = 10
+        self.color = (0, 255, 0)
+
+    def draw(self, screen):
+        pygame.draw.circle(screen, self.color, (self.x, self.y), self.size)
+
+    def is_touched(self, roomba_x, roomba_y, roomba_size):
+        return (self.x - roomba_x)**2 + (self.y - roomba_y)**2 < (self.size + roomba_size)**2
+
 def main():
     # Definición de las zonas con sus dimensiones (largo, ancho)
     zonas = {
@@ -45,6 +64,60 @@ def main():
     
     print(f"\nSuperficie total a limpiar: {superficie_total} cm²")
     print(f"Tiempo estimado de limpieza: {tiempo_limpeza:.2f} segundos")
+    
+    # Inicialización de Pygame
+    pygame.init()
+    screen = pygame.display.set_mode((800, 600))
+    pygame.display.set_caption("Roomba en movimiento")
+    
+    # Colores
+    WHITE = (255, 255, 255)
+    BLACK = (0, 0, 0)
+    RED = (255, 0, 0)
+    
+    # Posición inicial de la Roomba
+    x, y = 400, 300
+    roomba_size = 20
+    
+    # Posición objetivo inicial (misma que la posición inicial)
+    target_x, target_y = x, y
+    
+    # Crear una lista de ácaros
+    acaros = [Acro(random.randint(10, 790), random.randint(10, 590)) for _ in range(10)]
+    
+    clock = pygame.time.Clock()
+    running = True
+    
+    while running:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                running = False
+            elif event.type == pygame.MOUSEBUTTONDOWN:
+                # Actualizar la posición objetivo al hacer clic en la pantalla
+                target_x, target_y = event.pos
+        
+        # Mover la Roomba suavemente hacia la nueva posición objetivo
+        x = lerp(x, target_x, 0.1)
+        y = lerp(y, target_y, 0.1)
+        
+        # Dibujar la pantalla
+        screen.fill(WHITE)
+        
+        # Dibujar la Roomba
+        pygame.draw.circle(screen, RED, (int(x), int(y)), roomba_size)
+        
+        # Dibujar y verificar colisiones con los ácaros
+        for acaro in acaros[:]:
+            if acaro.is_touched(x, y, roomba_size):
+                acaros.remove(acaro)
+            else:
+                acaro.draw(screen)
+        
+        pygame.display.flip()
+        
+        clock.tick(30)
+    
+    pygame.quit()
     
 if __name__ == '__main__':
     main()
