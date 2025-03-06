@@ -1,7 +1,7 @@
 import pygame
 import random
-from roomba import Roomba
-from acaro import Acaro
+from Roomba import Roomba
+from Acaro import Acaro
 
 class Juego:
     def __init__(self):
@@ -25,11 +25,11 @@ class Juego:
             self.screen.fill(self.WHITE)
             self.roomba.draw(self.screen)
 
-            for acaro in self.acaros[:]:
-                if acaro.is_touched(self.roomba.x, self.roomba.y, self.roomba.size):
-                    self.acaros.remove(acaro)
+            for Acaro in self.acaros[:]:
+                if Acaro.is_touched(self.roomba.x, self.roomba.y, self.roomba.size):
+                    self.acaros.remove(Acaro)
                 else:
-                    acaro.draw(self.screen)
+                    Acaro.draw(self.screen)
 
             pygame.display.flip()
             self.clock.tick(30)

@@ -1,3 +1,8 @@
+import pygame
+
+def lerp(start, end, t):
+    return start + t * (end - start)
+
 class Roomba:
     def __init__(self, x, y):
         self.x = x

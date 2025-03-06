@@ -1,5 +1,8 @@
+import time
+import pygame
+import random
 import concurrent.futures
-from juego import Juego
+from Juego import Juego
 
 # Función para calcular el área de una zona
 def calcular_area(largo, ancho):
