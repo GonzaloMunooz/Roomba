@@ -2,6 +2,7 @@ import concurrent.futures
 import pygame
 import random
 
+
 def calcular_area(largo, ancho):
     """Calcula el área de una zona multiplicando largo por ancho."""
     return largo * ancho
@@ -83,7 +84,7 @@ def main():
     target_x, target_y = x, y
     
     # Crear una lista de ácaros
-    acaros = [Acro(random.randint(10, 790), random.randint(10, 590)) for _ in range(10)]
+
     
     clock = pygame.time.Clock()
     running = True
@@ -118,6 +119,33 @@ def main():
         clock.tick(30)
     
     pygame.quit()
+
+def spawnzombies():
+
+    def spawnmultiplezombies():
+         numero_aleatorio = random.randint(1, 10)
+         for i in range(1,numero_aleatorio):
+            
+  
+
+    with concurrent.futures.ThreadPoolExecutor() as executor:
+        # Asignamos cada cálculo a un hilo
+        future_to_zombis = {
+            executor.submit(calcular_area, largo, ancho): zona
+            for zona, (largo, ancho) in zonas.items()
+        }
+        
+        # Recogemos los resultados a medida que se van completando
+        for future in concurrent.futures.as_completed(future_to_zona):
+            zona = future_to_zona[future]
+            try:
+                area = future.result()
+            except Exception as exc:
+                print(f"{zona} generó una excepción: {exc}")
+            else:
+                areas[zona] = area
+                print(f"{zona}: {area} cm²")
+   
     
 if __name__ == '__main__':
     main()
