@@ -1,5 +1,7 @@
 import pygame
 import random
+from roomba import Roomba
+from acaro import Acaro
 
 class Juego:
     def __init__(self):

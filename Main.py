@@ -1,4 +1,5 @@
 import concurrent.futures
+from juego import Juego
 
 # Función para calcular el área de una zona
 def calcular_area(largo, ancho):
