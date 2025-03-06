@@ -2,7 +2,10 @@ import concurrent.futures
 import pygame
 import random
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> 6af4cd3cac857dd0408b5ce9745fb7976c2489d0
 def calcular_area(largo, ancho):
     """Calcula el área de una zona multiplicando largo por ancho."""
     return largo * ancho
@@ -84,7 +87,11 @@ def main():
     target_x, target_y = x, y
     
     # Crear una lista de ácaros
+<<<<<<< HEAD
 
+=======
+    acaros = [Acro(random.randint(10, 790), random.randint(10, 590)) for _ in range(10)]
+>>>>>>> 6af4cd3cac857dd0408b5ce9745fb7976c2489d0
     
     clock = pygame.time.Clock()
     running = True
@@ -119,6 +126,7 @@ def main():
         clock.tick(30)
     
     pygame.quit()
+<<<<<<< HEAD
 
 def spawnzombies():
 
@@ -146,6 +154,8 @@ def spawnzombies():
                 areas[zona] = area
                 print(f"{zona}: {area} cm²")
    
+=======
+>>>>>>> 6af4cd3cac857dd0408b5ce9745fb7976c2489d0
     
 if __name__ == '__main__':
     main()
