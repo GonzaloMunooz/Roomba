@@ -1,6 +1,5 @@
 import pygame
 import random
-import concurrent.futures
 from Roomba import Roomba
 from Acaro import Acaro
 from Puntuacion import Puntuacion
@@ -36,31 +35,27 @@ class Juego:
     def update_roomba(self):
         self.roomba.update_position()
 
+    def update_acaros(self):
+        for acaro in self.acaros[:]:
+            if acaro.update(self.roomba.x, self.roomba.y, self.roomba.size):
+                self.acaros.remove(acaro)
+                self.puntuacion.incrementar()
+
     def draw(self):
         self.screen.fill(self.WHITE)
         self.roomba.draw(self.screen)
-        for acaro in self.acaros[:]:
-            if acaro.is_touched(self.roomba.x, self.roomba.y, self.roomba.size):
-                self.acaros.remove(acaro)
-                self.puntuacion.incrementar()
-            else:
-                acaro.draw(self.screen)
+        for acaro in self.acaros:
+            acaro.draw(self.screen)
         self.puntuacion.render(self.screen)
         pygame.display.flip()
 
     def run(self):
-        with concurrent.futures.ThreadPoolExecutor() as executor:
-            while self.running:
-                # Ejecutar eventos y teclas en el hilo principal
-                self.handle_events()
-                self.handle_keys()
-
-                # Ejecutar actualización de la Roomba y dibujo en hilos separados
-                futures = [
-                    executor.submit(self.update_roomba),
-                    executor.submit(self.draw)
-                ]
-                concurrent.futures.wait(futures)
-                self.clock.tick(30)
+        while self.running:
+            self.handle_events()
+            self.handle_keys()
+            self.update_roomba()
+            self.update_acaros()
+            self.draw()
+            self.clock.tick(30)
         
         pygame.quit()
