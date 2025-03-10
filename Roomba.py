@@ -15,7 +15,7 @@ class Roomba:
         self.y = lerp(self.y, self.target_y, 0.45)
 
     def draw(self, screen):
-        pygame.draw.circle(screen, (255, 0, 0), (int(self.x), int(self.y)), self.size)
+        pygame.draw.circle(screen, (0, 0, 0), (int(self.x), int(self.y)), self.size)
 
     
 
