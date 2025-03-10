@@ -1,7 +1,9 @@
 import pygame
 import random
+import concurrent.futures
 from Roomba import Roomba
 from Acaro import Acaro
+from Boom import Boom
 from Puntuacion import Puntuacion
 
 class Juego:
@@ -11,10 +13,12 @@ class Juego:
         pygame.display.set_caption("Roomba en movimiento")
         self.WHITE = (255, 255, 255)
         self.acaros = [Acaro(random.randint(50, 750), random.randint(50, 550)) for _ in range(20)]
+        self.booms = []
         self.roomba = Roomba(400, 300)
         self.clock = pygame.time.Clock()
         self.running = True
         self.puntuacion = Puntuacion()
+        self.executor = concurrent.futures.ThreadPoolExecutor()
 
     def handle_events(self):
         for event in pygame.event.get():
@@ -46,10 +50,20 @@ class Juego:
         self.roomba.draw(self.screen)
         for acaro in self.acaros:
             acaro.draw(self.screen)
+        for boom in self.booms:
+            boom.draw(self.screen)
         self.puntuacion.render(self.screen)
         pygame.display.flip()
 
+    def create_booms(self):
+        while self.running:
+            x = random.randint(50, 750)
+            y = random.randint(50, 550)
+            self.booms.append(Boom(x, y, self))
+            pygame.time.wait(1000)  # Esperar 1 segundo antes de crear otro explosivo
+
     def run(self):
+        self.executor.submit(self.create_booms)
         while self.running:
             self.handle_events()
             self.handle_keys()
@@ -58,4 +72,10 @@ class Juego:
             self.draw()
             self.clock.tick(30)
         
+        self.stop_all_booms()
+        self.executor.shutdown(wait=True)
         pygame.quit()
+
+    def stop_all_booms(self):
+        for boom in self.booms:
+            boom.stop()
