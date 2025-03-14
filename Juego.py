@@ -9,14 +9,15 @@ from Puntuacion import Puntuacion
 class Juego:
     def __init__(self):
         pygame.init()  # Inicializar Pygame
-        self.screen = pygame.display.set_mode((800, 600))
-        pygame.display.set_caption("Roomba en movimiento")
+        self.screen = pygame.display.set_mode((800, 600)) # Crear la ventana
+        pygame.display.set_caption("Roomba en movimiento") #titulo
         self.WHITE = (255, 255, 255)
         self.acaros = [Acaro(random.randint(50, 750), random.randint(150, 600)) for _ in range(5)]
         self.booms = []
         self.roomba = Roomba(400, 300)
         self.clock = pygame.time.Clock()
         self.running = True
+        self.paused = False  # Variable para controlar el estado de pausa
         self.puntuacion = Puntuacion()
         self.executor = concurrent.futures.ThreadPoolExecutor()
 
@@ -24,6 +25,9 @@ class Juego:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 self.running = False
+            elif event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    self.paused = not self.paused  # Alternar el estado de pausa
 
     def handle_keys(self):
         keys = pygame.key.get_pressed()
@@ -64,10 +68,11 @@ class Juego:
 
     def create_booms(self):
         while self.running:
-            x = random.randint(50, 750)
-            y = 0
-            self.booms.append(Boom(x, y, self))
-            pygame.time.wait(150)  # Esperar 1 segundo antes de crear otro explosivo
+            if not self.paused:
+                x = random.randint(50, 750)
+                y = 0
+                self.booms.append(Boom(x, y, self))
+                pygame.time.wait(150)  # Esperar 1 segundo antes de crear otro explosivo
 
     def remove_boom(self, boom):
         if boom in self.booms:
@@ -77,11 +82,12 @@ class Juego:
         self.executor.submit(self.create_booms)
         while self.running:
             self.handle_events()
-            self.handle_keys()
-            self.update_roomba()
-            self.update_acaros()
-            self.update_booms()  # Actualizar la posición de los explosivos
-            self.draw()
+            if not self.paused:  # Solo actualizar y dibujar si el juego no está en pausa
+                self.handle_keys()
+                self.update_roomba()
+                self.update_acaros()
+                self.update_booms()  # Actualizar la posición de los explosivos
+                self.draw()
             self.clock.tick(30)
         
         self.stop_all_booms()
