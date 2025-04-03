@@ -1,3 +1,4 @@
+import json
 import pygame
 import random
 import concurrent.futures
@@ -6,11 +7,13 @@ from Acaro import Acaro
 from Boom import Boom
 from Puntuacion import Puntuacion
 
+
+
 class Juego:
     def __init__(self):
         pygame.init()  # Inicializar Pygame
-        self.screen = pygame.display.set_mode((800, 600)) # Crear la ventana
-        pygame.display.set_caption("Roomba en movimiento") #titulo
+        self.screen = pygame.display.set_mode((800, 600))
+        pygame.display.set_caption("Roomba en movimiento")
         self.WHITE = (255, 255, 255)
         self.acaros = [Acaro(random.randint(50, 750), random.randint(150, 600)) for _ in range(5)]
         self.booms = []
@@ -20,6 +23,23 @@ class Juego:
         self.paused = False  # Variable para controlar el estado de pausa
         self.puntuacion = Puntuacion()
         self.executor = concurrent.futures.ThreadPoolExecutor()
+        self.high_score = self.load_high_score()  # Cargar la puntuación máxima al inicio
+
+    def load_high_score(self):
+        """Carga la puntuación máxima desde un archivo JSON."""
+        try:
+            with open("high_score.json", "r") as file:
+                data = json.load(file)
+                return data.get("high_score", 0)
+        except (FileNotFoundError, json.JSONDecodeError):
+            return 0
+
+    def save_high_score(self):
+        """Guarda la puntuación máxima en un archivo JSON."""
+        if self.puntuacion.score > self.high_score:
+            self.high_score = self.puntuacion.score
+            with open("high_score.json", "w") as file:
+                json.dump({"high_score": self.high_score}, file)
 
     def handle_events(self):
         for event in pygame.event.get():
@@ -48,7 +68,7 @@ class Juego:
             if acaro.update(self.roomba.x, self.roomba.y, self.roomba.size):
                 self.acaros.remove(acaro)
                 self.puntuacion.incrementar()
-                # Crear un nuevo acaro en una posición aleatoria
+                # Crear un nuevo ácaro en una posición aleatoria
                 new_acaro = Acaro(random.randint(50, 750), random.randint(150, 600))
                 self.acaros.append(new_acaro)
 
@@ -68,11 +88,10 @@ class Juego:
 
     def create_booms(self):
         while self.running:
-            if not self.paused:
-                x = random.randint(50, 750)
-                y = 0
-                self.booms.append(Boom(x, y, self))
-                pygame.time.wait(150)  # Esperar 1 segundo antes de crear otro explosivo
+            x = random.randint(50, 750)
+            y = 0
+            self.booms.append(Boom(x, y, self))
+            pygame.time.wait(150)  # Esperar 1 segundo antes de crear otro explosivo
 
     def remove_boom(self, boom):
         if boom in self.booms:
@@ -90,6 +109,7 @@ class Juego:
                 self.draw()
             self.clock.tick(30)
         
+        self.save_high_score()  # Guardar la puntuación máxima al finalizar el juego
         self.stop_all_booms()
         self.executor.shutdown(wait=True)
         pygame.quit()
